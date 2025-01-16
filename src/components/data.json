@@ -1,0 +1,52 @@
+{
+    "users": [
+      {
+        "id": "u1",
+        "billId": "ELEC001",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "address": "123 Main St, City",
+        "branchId": "b1"
+      },
+      {
+        "id": "u2",
+        "billId": "ELEC002",
+        "name": "Jane Smith",
+        "email": "jane@example.com",
+        "address": "456 Oak Ave, Town",
+        "branchId": "b1"
+      }
+    ],
+    "bills": [
+      {
+        "id": "bill1",
+        "userId": "u1",
+        "amount": 150.50,
+        "dueDate": "2024-04-15",
+        "status": "pending"
+      },
+      {
+        "id": "bill2",
+        "userId": "u1",
+        "amount": 130.75,
+        "dueDate": "2024-03-15",
+        "status": "paid",
+        "paidDate": "2024-03-10"
+      }
+    ],
+    "branches": [
+      {
+        "id": "b1",
+        "name": "Downtown Branch",
+        "location": "Central City",
+        "managerId": "m1"
+      },
+      {
+        "id": "b2",
+        "name": "Suburban Branch",
+        "location": "Outer City",
+        "managerId": "m2"
+      }
+    ]
+  }
+  
