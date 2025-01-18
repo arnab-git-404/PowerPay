@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr
-from typing import List
 
 
 class CustomerSignup(BaseModel):
@@ -11,11 +10,12 @@ class CustomerSignup(BaseModel):
 
 
 class CustomerLogin(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 
 class Address(BaseModel):
+    accountNumber: str
     house_no: str
     street: str
     city: str
@@ -25,30 +25,18 @@ class Address(BaseModel):
 
 
 class CustomerDashboard(BaseModel):
-    name: str
     accountNumber: str
-    email: EmailStr
-    phone: str
-    address: Address
-    balance: float
-    dueAmount: float
-    dueDate: str
-    payment_history: List[dict]
+
+
+class BranchDashboard(BaseModel):
+    branchCode: str
+
+
+class DeleteAccount(BaseModel):
+    accountNumber: str
 
 
 class CompanyLogin(BaseModel):
     email: EmailStr
     password: str
     type: str
-
-
-class BranchDashboard(BaseModel):
-    branch: str
-    branch_code: str
-    branch_address: Address
-    branch_employees: List[dict]
-    branch_customers: List[dict]
-
-
-class DeleteAccount(BaseModel):
-    account_no: str

@@ -54,3 +54,5 @@ docker-compose.override.yml
 backend/ignores/
 frontend/ignores/
 README copy.md
+backend/try.py
+backend/data/

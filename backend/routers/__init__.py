@@ -11,12 +11,12 @@ api_router.include_router(
     tags=["Customer"]
 )
 api_router.include_router(
-    company_router,
-    prefix="/company",
-    tags=["Company"]
-)
-api_router.include_router(
     branch_router,
     prefix="/branch",
     tags=["Branch"]
+)
+api_router.include_router(
+    company_router,
+    prefix="/company",
+    tags=["Company"]
 )

@@ -1,50 +1,60 @@
 from fastapi import APIRouter, HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
-from schemas.schemas import (
+from fastapi.responses import JSONResponse
+from schemas import (
     CustomerSignup,
     CustomerLogin,
     Address,
     CustomerDashboard
 )
+from services import CustomerHandler
 
 router = APIRouter()
-client = AsyncIOMotorClient("MONGODB_URL")
-database = client.your_database_name
-customers_collection = database.get_collection("customers")
-addresses_collection = database.get_collection("addresses")
+customerObj = CustomerHandler()
 
 
 @router.post("/signup")
 async def customer_signup(customer: CustomerSignup):
-    result = await customers_collection.insert_one(customer.model_dump())
-    return {
-        "message": "Customer signed up successfully",
-        "id": str(result.inserted_id)
-    }
+    result = customerObj.customerSignup(customer.model_dump())
+    return result
 
 
 @router.post("/login")
 async def customer_login(customer: CustomerLogin):
-    user = await customers_collection.find_one({"email": customer.email})
-    if user and user["password"] == customer.password:
-        return {"message": "Customer logged in successfully"}
+
+    user = customerObj.customerLogin(customer.model_dump())
+    if user:
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Customer logged in successfully",
+                "data": user
+            }
+        )
     raise HTTPException(status_code=400, detail="Invalid credentials")
 
 
-@router.post("/set/address")
+@router.post("/set_address")
 async def set_address(address: Address):
-    result = await addresses_collection.insert_one(address.model_dump())
-    return {
-        "message": "Address set successfully",
-        "id": str(result.inserted_id)
-    }
+    result = customerObj.setAddress(address.model_dump())
+    if result:
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Address saved successfully"
+            }
+        )
+    raise HTTPException(status_code=404, detail="Customer not found")
 
 
 @router.post("/dashboard")
 async def customer_dashboard(dashboard: CustomerDashboard):
-    customer = await customers_collection.find_one(
-        {"customer_id": dashboard.customer_id}
-    )
+    customer = customerObj.getCustomer(dashboard.accountNumber)
     if customer:
-        return {"message": "Customer dashboard data", "data": customer}
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Customer dashboard data",
+                "data": customer
+            }
+        )
     raise HTTPException(status_code=404, detail="Customer not found")

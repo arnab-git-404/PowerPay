@@ -1,29 +1,31 @@
 from fastapi import APIRouter, HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
-from schemas.schemas import BranchDashboard, DeleteAccount
+from fastapi.responses import JSONResponse
+from services import CustomerHandler, BranchHandler
+from schemas import BranchDashboard, DeleteAccount
 
 router = APIRouter()
-client = AsyncIOMotorClient("MONGODB_URL")
-database = client.your_database_name
-branches_collection = database.get_collection("branches")
-customers_collection = database.get_collection("customers")
+
+branchObj = BranchHandler()
+customerObj = CustomerHandler()
 
 
 @router.post("/dashboard")
 async def branch_dashboard(dashboard: BranchDashboard):
-    branch = await branches_collection.find_one(
-        {"branch_code": dashboard.branch_code}
-    )
+    branch = branchObj.branchData(dashboard.branchCode)
     if branch:
-        return {"message": "Branch dashboard data", "data": branch}
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Branch dashboard data", "data": branch}
+        )
     raise HTTPException(status_code=404, detail="Branch not found")
 
 
-@router.post("/delete/account")
+@router.post("/delete_account")
 async def delete_account(account: DeleteAccount):
-    result = await customers_collection.delete_one(
-        {"account_no": account.account_no}
-    )
-    if result.deleted_count == 1:
-        return {"message": "Account deleted successfully"}
+    result = customerObj.deleteAccount(account.accountNumber)
+    if result:
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Account deleted successfully"}
+        )
     raise HTTPException(status_code=404, detail="Account not found")

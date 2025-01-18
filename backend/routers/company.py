@@ -1,19 +1,23 @@
 from fastapi import APIRouter, HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
-from schemas.schemas import CompanyLogin
+from fastapi.responses import JSONResponse
+from schemas import CompanyLogin
+from services import CompanyHandler
 
 router = APIRouter()
-client = AsyncIOMotorClient("MONGODB_URL")
-database = client.your_database_name
-branches_collection = database.get_collection("branches")
+
+companyObj = CompanyHandler()
 
 
 @router.post("/login")
 async def company_login(company: CompanyLogin):
-    user = await branches_collection.find_one(
-        {"email": company.email,
-         "type": company.type}
-    )
-    if user and user["password"] == company.password:
-        return {"message": "Company logged in successfully"}
+    user = companyObj.companyLogin(company.model_dump())
+
+    if user:
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Login successful",
+                "data": user
+            }
+        )
     raise HTTPException(status_code=400, detail="Invalid credentials")
