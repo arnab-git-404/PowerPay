@@ -131,6 +131,7 @@ function CustomerLogin() {
               </div>
             </form>
             <br />
+
             <div>
               <p className="text-center text-sm">
                 Don't have an account? &nbsp;&nbsp; | &nbsp;&nbsp;
@@ -142,6 +143,7 @@ function CustomerLogin() {
                 </Link>
               </p>
             </div>
+            
           </div>
         </div>
       </div>

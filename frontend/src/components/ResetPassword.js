@@ -93,6 +93,7 @@ function ResetPassword({ type }) {
       <div className="w-full max-w-md">
         <div className="bg-white shadow-lg rounded-lg">
           <div className="p-5">
+            
             <form className="mb-3" onSubmit={handleSubmit}>
               <div className="text-3xl sm:text-4xl mb-5 font-semibold text-center">
                 Reset Password

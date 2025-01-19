@@ -172,7 +172,8 @@ function CompanyLogin() {
             </form>
 
             <br />
-            <div>
+
+            {/* <div>
               <p className="text-center text-sm">
                 Don't have an account? &nbsp;&nbsp; | &nbsp;&nbsp;
                 <Link
@@ -182,7 +183,8 @@ function CompanyLogin() {
                   Sign Up
                 </Link>
               </p>
-            </div>
+            </div> */}
+
           </div>
         </div>
       </div>

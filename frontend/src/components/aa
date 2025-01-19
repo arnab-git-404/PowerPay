@@ -1,0 +1,257 @@
+// import React, { useState } from 'react';
+// import { Link } from 'react-router-dom';
+
+// const AdminDashboard = () => {
+//   // Mock data for customers
+//   const [customers, setCustomers] = useState([
+//     { id: 1, ac_no : 7985 , name: 'John Doe', email: 'john@example.com', dueBalance: 100.00, dueDate: '2023-04-15' },
+//     { id: 2, ac_no : 7985 , name: 'Jane Smith', email: 'jane@example.com', dueBalance: 50.00 , dueDate: '2023-05-20' },
+//   ]);
+
+//   const [newCustomer, setNewCustomer] = useState({
+//     name: '',
+//     email: '',
+//     balance: 0.00,
+//   });
+
+//   const [totalBills, setTotalBills] = useState(150.00); // Total of pending bills
+
+//   // Handle adding a new customer
+//   const handleAddCustomer = () => {
+//     if (newCustomer.name && newCustomer.email && newCustomer.balance >= 0) {
+//       setCustomers([...customers, { ...newCustomer, id: customers.length + 1 }]);
+//       setTotalBills(totalBills + newCustomer.balance); // Add the new balance to the total pending bills
+//       setNewCustomer({ name: '', email: '', balance: 0.00 }); // Reset form fields
+//     }
+//   };
+
+//   // Handle deleting a customer
+//   const handleDeleteCustomer = (id, balance) => {
+//     setCustomers(customers.filter(customer => customer.id !== id));
+//     setTotalBills(totalBills - balance); // Subtract the deleted customer's balance from total bills
+//   };
+
+//   const handleGenerateBill = () => {
+
+//   };
+//   return (
+//     <div className="container mx-auto p-6">
+//       <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+
+//       {/* Add New Customer Form
+//        <div className="bg-green-400  p-6 rounded-lg shadow-lg mb-6">
+//         <h2 className="text-xl font-semibold mb-4 ">Add New Customer</h2>
+//         <div className="mb-4">
+//           <input
+//             type="text"
+//             placeholder="Name"
+//             value={newCustomer.name}
+//             onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+//             className="w-full p-2 border border-gray-300 rounded mb-2"
+//           />
+//           <input
+//             type="email"
+//             placeholder="Email"
+//             value={newCustomer.email}
+//             onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+//             className="w-full p-2 border border-gray-300 rounded mb-2"
+//           />
+//           <input
+//             type="number"
+//             placeholder="Balance"
+//             value={newCustomer.balance}
+//             onChange={(e) => setNewCustomer({ ...newCustomer, balance: parseFloat(e.target.value) })}
+//             className="w-full p-2 border border-gray-300 rounded mb-4"
+//           />
+//           <button
+//             onClick={handleAddCustomer}
+//             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+//           >
+//             Add Customer
+//           </button>
+//         </div>
+//       </div> */}
+
+//       {/* Total Pending Bills */}
+//       <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+//         <h2 className="text-xl font-semibold mb-4">Total Pending Bills</h2>
+//         <p className="text-lg">${totalBills.toFixed(2)}</p>
+//       </div>
+
+//       {/* Customers List */}
+//       <div className="bg-white p-6 rounded-lg shadow-lg">
+//         <h2 className="text-xl font-semibold mb-4">All Customers ({customers.length}) </h2>
+
+//         <table className="min-w-full bg-white">
+//           <thead>
+//             <tr>
+//             <th className="py-2 px-4 text-left">Account Number</th>
+//               <th className="py-2 px-4 text-left">Name</th>
+//               <th className="py-2 px-4 text-left">Balance Due</th>
+//               <th className="py-2 px-4 text-left">Due Date</th>
+//               <th className="py-2 px-4 text-left">Actions</th>
+//             </tr>
+//           </thead>
+
+//           <tbody>
+
+//             {customers.map((customer) => (
+//               <tr key={customer.id}>
+//                 <td className="py-2 px-4">{customer.ac_no}</td>
+//                 <td className="py-2 px-4">{customer.name}</td>
+//                 <td className="py-2 px-4">${customer.dueBalance.toFixed(2)}</td>
+//                 <td className="py-2 px-4">{customer.dueDate}</td>
+
+//                 <td className="py-2">
+//                   <button
+//                     onClick={() => handleGenerateBill(customer.id, customer.balance)}
+//                     className="text-blue-600 hover:underline px-4"
+//                   >
+//                     Generate Bill
+//                   </button>
+
+//                   <button
+//                     onClick={() => handleDeleteCustomer(customer.id, customer.balance)}
+//                     className="text-red-600 hover:underline"
+//                   >
+//                     Delete
+//                   </button>
+
+//                 </td>
+//               </tr>
+//             ))}
+
+//           </tbody>
+//         </table>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default AdminDashboard;
+
+import React, { useState } from "react";
+import { jsPDF } from "jspdf";
+import { BsPersonCircle } from "react-icons/bs";
+import { RiMoneyRupeeCircleFill } from "react-icons/ri";
+
+const AdminDashboard = () => {
+  const [customers, setCustomers] = useState([
+    {
+      id: 1,
+      ac_no: 7985,
+      name: "John Doe",
+      email: "john@example.com",
+      address: "123 Main St, NY",
+      dueBalance: 100.0,
+      dueDate: "2023-04-15",
+    },
+    {
+      id: 2,
+      ac_no: 7986,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      address: "456 Oak St, LA",
+      dueBalance: 50.0,
+      dueDate: "2023-05-20",
+    },
+  ]);
+
+  const [totalBills, setTotalBills] = useState(150.0);
+
+  // Function to generate and download bill as PDF
+  const handleGenerateBill = (customer) => {
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Billing Invoice", 80, 20);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`Account Number: ${customer.ac_no}`, 20, 40);
+    doc.text(`Name: ${customer.name}`, 20, 50);
+    doc.text(`Email: ${customer.email}`, 20, 60);
+    doc.text(`Address: ${customer.address}`, 20, 70);
+    doc.text(`Due Balance: $${customer.dueBalance.toFixed(2)}`, 20, 80);
+    doc.text(`Due Date: ${customer.dueDate}`, 20, 90);
+
+    // Footer
+    doc.line(20, 100, 190, 100);
+    doc.text("Thank you for your payment!", 20, 110);
+
+    // Save the PDF
+    doc.save(`Bill_${customer.name}.pdf`);
+  };
+
+  // Function to delete customer
+  const handleDeleteCustomer = (id, balance) => {
+    setCustomers(customers.filter((customer) => customer.id !== id));
+    setTotalBills(totalBills - balance);
+  };
+
+
+
+  return (
+    <div className="container mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+
+      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <h2 className="flex items-center text-xl font-semibold mb-4 gap-2">
+          <RiMoneyRupeeCircleFill className="text-2xl" />
+          Total Pending Bills
+        </h2>
+        <p className="text-lg">${totalBills.toFixed(2)}</p>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="flex items-center text-xl font-semibold mb-4 gap-2">
+          <BsPersonCircle className="text-2xl" />
+          All Customers ({customers.length})
+        </h2>
+
+        <table className="min-w-full bg-white">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 text-left">Account No</th>
+              <th className="py-2 px-4 text-left">Name</th>
+              <th className="py-2 px-4 text-left">Due Balance</th>
+              <th className="py-2 px-4 text-left">Due Date</th>
+              <th className="py-2 px-4 text-left">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {customers.map((customer) => (
+              <tr key={customer.id}>
+                <td className="py-2 px-4">{customer.ac_no}</td>
+                <td className="py-2 px-4">{customer.name}</td>
+                <td className="py-2 px-4">${customer.dueBalance.toFixed(2)}</td>
+                <td className="py-2 px-4">{customer.dueDate}</td>
+                <td className="py-2">
+                  <button
+                    onClick={() => handleModifyUser(customer)}
+                    className="text-blue-600 hover:underline px-4"
+                  >
+                    Modify
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      handleDeleteCustomer(customer.id, customer.dueBalance)
+                    }
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
