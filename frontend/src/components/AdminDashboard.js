@@ -1,90 +1,89 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import Modal from "react-modal";
+import { BsPersonCircle } from "react-icons/bs";
+import { RiMoneyRupeeCircleFill } from "react-icons/ri";
+
+Modal.setAppElement("#root"); // Required for accessibility
 
 const AdminDashboard = () => {
-  // Mock data for customers
   const [customers, setCustomers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', balance: 100.00 },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', balance: 50.00 },
+    {
+      id: 1,
+      ac_no: 7985,
+      name: "John Doe",
+      email: "john@example.com",
+      address: "123 Main St, NY",
+      dueBalance: 100.0,
+      dueDate: "2023-04-15",
+    },
+    {
+      id: 2,
+      ac_no: 7986,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      address: "456 Oak St, LA",
+      dueBalance: 50.0,
+      dueDate: "2023-05-20",
+    },
   ]);
 
-  const [newCustomer, setNewCustomer] = useState({
-    name: '',
-    email: '',
-    balance: 0.00,
-  });
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState(null);
+  const [totalBills, setTotalBills] = useState(150.0);
 
-  const [totalBills, setTotalBills] = useState(150.00); // Total of pending bills
-
-  // Handle adding a new customer
-  const handleAddCustomer = () => {
-    if (newCustomer.name && newCustomer.email && newCustomer.balance >= 0) {
-      setCustomers([...customers, { ...newCustomer, id: customers.length + 1 }]);
-      setTotalBills(totalBills + newCustomer.balance); // Add the new balance to the total pending bills
-      setNewCustomer({ name: '', email: '', balance: 0.00 }); // Reset form fields
-    }
+  // Open modal and set user data
+  const handleModifyUser = (customer) => {
+    setEditingCustomer(customer);
+    setModalIsOpen(true);
   };
 
-  // Handle deleting a customer
+  // Update user data
+  const handleSaveChanges = () => {
+    setCustomers(
+      customers.map((cust) =>
+        cust.id === editingCustomer.id ? editingCustomer : cust
+      )
+    );
+    setModalIsOpen(false);
+  };
+
   const handleDeleteCustomer = (id, balance) => {
-    setCustomers(customers.filter(customer => customer.id !== id));
-    setTotalBills(totalBills - balance); // Subtract the deleted customer's balance from total bills
+      setCustomers(customers.filter((customer) => customer.id !== id));
+      setTotalBills(totalBills - balance);
+      console.log("sjdgsdkngsn");
   };
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
-      {/* Add New Customer Form */}
-      <div className="bg-green-400  p-6 rounded-lg shadow-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4 ">Add New Customer</h2>    
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Name"
-            value={newCustomer.name}
-            onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-            className="w-full p-2 border border-gray-300 rounded mb-2"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={newCustomer.email}
-            onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-            className="w-full p-2 border border-gray-300 rounded mb-2"
-          />
-          <input
-            type="number"
-            placeholder="Balance"
-            value={newCustomer.balance}
-            onChange={(e) => setNewCustomer({ ...newCustomer, balance: parseFloat(e.target.value) })}
-            className="w-full p-2 border border-gray-300 rounded mb-4"
-          />
-          <button
-            onClick={handleAddCustomer}
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-          >
-            Add Customer
-          </button>
-        </div>
-      </div>
+    <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
-      {/* Total Pending Bills */}
       <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4">Total Pending Bills</h2>
+
+        <h2 className="flex items-center text-xl font-semibold mb-4 gap-2">
+          
+          <RiMoneyRupeeCircleFill className="text-2xl" />
+          Total Pending Bills
+        </h2>
         <p className="text-lg">${totalBills.toFixed(2)}</p>
       </div>
 
-      {/* Customers List */}
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">All Customers ({customers.length}) </h2>
+
+
+        <h2 className="flex items-center text-xl font-semibold mb-4 gap-2">
+          <BsPersonCircle className="text-2xl" />
+          All Customers ({customers.length})
+        </h2>
+
 
         <table className="min-w-full bg-white">
           <thead>
             <tr>
+              <th className="py-2 px-4 text-left">Account No</th>
               <th className="py-2 px-4 text-left">Name</th>
-              <th className="py-2 px-4 text-left">Email</th>
-              <th className="py-2 px-4 text-left">Balance</th>
+              <th className="py-2 px-4 text-left">Due Balance</th>
+              <th className="py-2 px-4 text-left">Due Date</th>
               <th className="py-2 px-4 text-left">Actions</th>
             </tr>
           </thead>
@@ -92,13 +91,21 @@ const AdminDashboard = () => {
           <tbody>
             {customers.map((customer) => (
               <tr key={customer.id}>
+                <td className="py-2 px-4">{customer.ac_no}</td>
                 <td className="py-2 px-4">{customer.name}</td>
-                <td className="py-2 px-4">{customer.email}</td>
-                <td className="py-2 px-4">${customer.balance.toFixed(2)}</td>
-                <td className="py-2 px-4">
+                <td className="py-2 px-4">${customer.dueBalance.toFixed(2)}</td>
+                <td className="py-2 px-4">{customer.dueDate}</td>
+                <td className="py-2">
                   <button
-                    onClick={() => handleDeleteCustomer(customer.id, customer.balance)}
-                    className="text-red-600 hover:underline"
+                    onClick={() => handleModifyUser(customer)}
+                    className="bg-blue-500 text-white px-4 py-1 rounded-lg mx-2"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteCustomer(customer.id, customer.dueBalance)}
+                    className="bg-red-600 text-white px-4 py-1 rounded-lg mx-2"
                   >
                     Delete
                   </button>
@@ -108,6 +115,98 @@ const AdminDashboard = () => {
           </tbody>
         </table>
       </div>
+
+
+      {/* Edit User Modal */}
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto mt-20"
+      >
+        <h2 className="text-xl font-semibold mb-4">Edit User</h2>
+
+        {editingCustomer && (
+          <div>
+            <p>Name</p>
+            <input
+              type="text"
+              value={editingCustomer.name}
+              onChange={(e) =>
+                setEditingCustomer({ ...editingCustomer, name: e.target.value })
+              }
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              placeholder="Name"
+            />
+
+              <p>Account Number</p>
+            <input
+              type="text"
+              value={editingCustomer.ac_no}
+              onChange={(e) =>
+                setEditingCustomer({
+                  ...editingCustomer,
+                  ac_no: e.target.value,
+                })
+              }
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              placeholder="Account Number"
+            />
+
+            <p>Address</p>
+            <input
+              type="text"
+              value={editingCustomer.address}
+              onChange={(e) =>
+                setEditingCustomer({
+                  ...editingCustomer,
+                  address: e.target.value,
+                })
+              }
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              placeholder="Address"
+            />
+            <p>Due Balance</p>
+            <input
+              type="number"
+              value={editingCustomer.dueBalance}
+              onChange={(e) =>
+                setEditingCustomer({
+                  ...editingCustomer,
+                  dueBalance: parseFloat(e.target.value),
+                })
+              }
+              className="w-full p-2 border border-gray-300 rounded mb-2"
+              placeholder="Due Balance"
+            />
+            
+            <p>Due Date</p>
+            <input
+              type="date"
+              value={editingCustomer.dueDate}
+              onChange={(e) =>
+                setEditingCustomer({
+                  ...editingCustomer,
+                  dueDate: e.target.value,
+                })
+              }
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+            />
+
+            <button
+              onClick={handleSaveChanges}
+              className="bg-blue-500 text-white py-2 px-4 rounded-lg mr-2"
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={() => setModalIsOpen(false)}
+              className="bg-red-500 text-white py-2 px-4 rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
