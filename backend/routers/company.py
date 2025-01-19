@@ -5,12 +5,12 @@ from services import CompanyHandler
 
 router = APIRouter()
 
-companyObj = CompanyHandler()
+company_handler = CompanyHandler()
 
 
 @router.post("/login")
 async def company_login(company: CompanyLogin):
-    user = companyObj.companyLogin(company.model_dump())
+    user = company_handler.company_login(company.model_dump())
 
     if user:
         return JSONResponse(

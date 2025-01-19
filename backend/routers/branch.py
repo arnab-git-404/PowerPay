@@ -5,13 +5,13 @@ from schemas import BranchDashboard, DeleteAccount
 
 router = APIRouter()
 
-branchObj = BranchHandler()
-customerObj = CustomerHandler()
+branch_handler = BranchHandler()
+customer_handler = CustomerHandler()
 
 
 @router.post("/dashboard")
 async def branch_dashboard(dashboard: BranchDashboard):
-    branch = branchObj.branchData(dashboard.branchCode)
+    branch = branch_handler.branch_data(dashboard.branch_code)
     if branch:
         return JSONResponse(
             status_code=200,
@@ -22,7 +22,7 @@ async def branch_dashboard(dashboard: BranchDashboard):
 
 @router.post("/delete_account")
 async def delete_account(account: DeleteAccount):
-    result = customerObj.deleteAccount(account.accountNumber)
+    result = customer_handler.delete_account(account.account_number)
     if result:
         return JSONResponse(
             status_code=200,

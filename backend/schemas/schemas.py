@@ -1,4 +1,5 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, model_validator
+from typing import Optional
 
 
 class CustomerSignup(BaseModel):
@@ -10,12 +11,19 @@ class CustomerSignup(BaseModel):
 
 
 class CustomerLogin(BaseModel):
-    email: str
+    email: Optional[EmailStr] = None
+    account_number: Optional[str] = None
     password: str
+
+    @model_validator(mode='before')
+    def check_email_or_account_number(cls, values):
+        if not values.get('email') and not values.get('account_number'):
+            raise ValueError('Either email or account number must be provided')
+        return values
 
 
 class Address(BaseModel):
-    accountNumber: str
+    account_number: str
     house_no: str
     street: str
     city: str
@@ -25,15 +33,15 @@ class Address(BaseModel):
 
 
 class CustomerDashboard(BaseModel):
-    accountNumber: str
+    account_number: str
 
 
 class BranchDashboard(BaseModel):
-    branchCode: str
+    branch_code: str
 
 
 class DeleteAccount(BaseModel):
-    accountNumber: str
+    account_number: str
 
 
 class CompanyLogin(BaseModel):

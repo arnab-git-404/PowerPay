@@ -9,19 +9,27 @@ from schemas import (
 from services import CustomerHandler
 
 router = APIRouter()
-customerObj = CustomerHandler()
+customer_handler = CustomerHandler()
 
 
 @router.post("/signup")
 async def customer_signup(customer: CustomerSignup):
-    result = customerObj.customerSignup(customer.model_dump())
+    result, message = customer_handler.customer_signup(customer.model_dump())
+    if result:
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": message,
+                "account_number": result
+            }
+        )
+    raise HTTPException(status_code=400, detail=message)
     return result
 
 
 @router.post("/login")
 async def customer_login(customer: CustomerLogin):
-
-    user = customerObj.customerLogin(customer.model_dump())
+    user = customer_handler.customer_login(customer.model_dump())
     if user:
         return JSONResponse(
             status_code=200,
@@ -35,7 +43,7 @@ async def customer_login(customer: CustomerLogin):
 
 @router.post("/set_address")
 async def set_address(address: Address):
-    result = customerObj.setAddress(address.model_dump())
+    result = customer_handler.set_address(address.model_dump())
     if result:
         return JSONResponse(
             status_code=200,
@@ -48,7 +56,7 @@ async def set_address(address: Address):
 
 @router.post("/dashboard")
 async def customer_dashboard(dashboard: CustomerDashboard):
-    customer = customerObj.getCustomer(dashboard.accountNumber)
+    customer = customer_handler.get_customer(dashboard.account_number)
     if customer:
         return JSONResponse(
             status_code=200,
