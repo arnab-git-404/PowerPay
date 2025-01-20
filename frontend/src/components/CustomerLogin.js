@@ -54,11 +54,13 @@ function CustomerLogin() {
         notify("Logged In Successfully", "success");
         setLoginSuccess(true);
       } else {
-        notify(json.detail, "error");
+        alert(json.detail);
+        // notify(json.detail, "error");
       }
     } catch (err) {
       setSpinner(false);
-      notify("An error occurred. Please try again.", "error");
+      alert("An error occurred. Please try again.");
+      // notify("An error occurred. Please try again.", "error");
     }
   };
 

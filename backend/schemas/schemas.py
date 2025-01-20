@@ -32,16 +32,12 @@ class Address(BaseModel):
     branch: str
 
 
-class CustomerDashboard(BaseModel):
+class AccountNumber(BaseModel):
     account_number: str
 
 
 class BranchDashboard(BaseModel):
     branch_code: str
-
-
-class DeleteAccount(BaseModel):
-    account_number: str
 
 
 class CompanyLogin(BaseModel):

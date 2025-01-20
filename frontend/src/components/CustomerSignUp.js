@@ -84,12 +84,14 @@ function CustomerSignUp() {
         navigate("/customer/update-contact");
         console.log(json);
       } else {
-        notify(json.detail, "error");
+        alert(json.detail);
+        // notify(json.detail, "error");
         console.log(json);
       }
     } catch (err) {
       setSpinner(false);
-      notify("An error occurred. Please try again.", "error");
+      alert("An error occurred. Please try again.");
+      // notify("An error occurred. Please try again.", "error");
       console.log(err);
     }
   };

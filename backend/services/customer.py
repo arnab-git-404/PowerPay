@@ -95,6 +95,15 @@ class CustomerHandler:
             return user[0]
         return None
 
+    def billing_history(
+        self, account_number: str
+    ) -> Union[List[Dict[str, Any]], None]:
+        customer = self.load_customer()
+        user = self.find_user(customer, account_number, key="account_number")
+        if user:
+            return user[0]["payment_history"]
+        return None
+
     def delete_account(self, account_number: str) -> bool:
         customer = self.load_customer()
         branch = self.load_branch()

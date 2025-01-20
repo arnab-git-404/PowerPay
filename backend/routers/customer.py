@@ -4,7 +4,7 @@ from schemas import (
     CustomerSignup,
     CustomerLogin,
     Address,
-    CustomerDashboard
+    AccountNumber
 )
 from services import CustomerHandler
 
@@ -54,7 +54,7 @@ async def set_address(address: Address):
 
 
 @router.post("/dashboard")
-async def customer_dashboard(dashboard: CustomerDashboard):
+async def customer_dashboard(dashboard: AccountNumber):
     customer = customer_handler.get_customer(dashboard.account_number)
     if customer:
         return JSONResponse(
@@ -62,6 +62,20 @@ async def customer_dashboard(dashboard: CustomerDashboard):
             content={
                 "message": "Customer dashboard data",
                 "data": customer
+            }
+        )
+    raise HTTPException(status_code=404, detail="Customer not found")
+
+
+@router.post("/billing_history")
+async def billing_history(account: AccountNumber):
+    history = customer_handler.billing_history(account.account_number)
+    if history:
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Billing history",
+                "data": history
             }
         )
     raise HTTPException(status_code=404, detail="Customer not found")
