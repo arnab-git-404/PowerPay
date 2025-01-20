@@ -20,11 +20,10 @@ async def customer_signup(customer: CustomerSignup):
             status_code=200,
             content={
                 "message": message,
-                "account_number": result
+                "data": result
             }
         )
     raise HTTPException(status_code=400, detail=message)
-    return result
 
 
 @router.post("/login")

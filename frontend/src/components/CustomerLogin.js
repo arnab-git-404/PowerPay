@@ -1,55 +1,68 @@
-import React, { useContext, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import globalContext from '../context/global/globalContext';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import globalContext from "../context/global/globalContext";
+import { Eye, EyeOff } from "lucide-react";
 
 function CustomerLogin() {
-  document.title = 'PowerPay | Customer Login';
+  document.title = "PowerPay | Customer Login";
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isCustomerLoggedIn, customerLogin, host } =
-    gcontext;
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const { notify, setSpinner, isCustomerLoggedIn, customerLogin } = gcontext;
+
+  const host = process.env.REACT_APP_HOST;
+
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
   let navigate = useNavigate();
 
-  if (isCustomerLoggedIn) {
-    navigate('/customer');
-  }
-  const handleSubmit = async e => {
+  useEffect(() => {
+    if (isCustomerLoggedIn || loginSuccess) {
+      navigate("/customer/dashboard");
+    }
+  }, [isCustomerLoggedIn, loginSuccess, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = credentials;
     setSpinner(true);
-    console.log(email, password);
 
+    try {
+      const response = await fetch(`${host}/customer/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    // const response = await fetch(`${host}/api/auth/customerlogin`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     email,
-    //     password,
-    //   }),
-    // });
-    // setSpinner(false);
+      const json = await response.json();
+      setSpinner(false);
 
-    // const json = await response.json();
-    // if (json.success) {
-    //   const data = {
-    //     name: json.name,
-    //     email: json.email,
-    //     token: json.authToken,
-    //   };
-    //   customerLogin(data);
-    //   notify('Logged In Successfully', 'success');
-    //   navigate('/customer');
-    // } else {
-    //   notify('Invalid credentials', 'error');
-    // }
+      if (response.ok) {
+        const data = {
+          name: json.data.name,
+          email: json.data.email,
+          account_number: json.data.account_number,
+          token: json.data.token, // Assuming the backend returns a token
+        };
+        customerLogin(data);
+        localStorage.setItem("customerData", JSON.stringify(data)); // Save data to local storage
+        localStorage.setItem("token", data.token); // Save token to local storage
+        notify("Logged In Successfully", "success");
+        setLoginSuccess(true);
+      } else {
+        notify(json.detail, "error");
+      }
+    } catch (err) {
+      setSpinner(false);
+      notify("An error occurred. Please try again.", "error");
+    }
   };
 
-  const onChange = e => {
+  const onChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
@@ -92,7 +105,7 @@ function CustomerLogin() {
               <div className="relative mb-3">
                 <input
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   placeholder="*******"
@@ -131,7 +144,6 @@ function CustomerLogin() {
               </div>
             </form>
             <br />
-
             <div>
               <p className="text-center text-sm">
                 Don't have an account? &nbsp;&nbsp; | &nbsp;&nbsp;
@@ -143,7 +155,6 @@ function CustomerLogin() {
                 </Link>
               </p>
             </div>
-            
           </div>
         </div>
       </div>

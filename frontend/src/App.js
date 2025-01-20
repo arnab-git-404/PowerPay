@@ -15,7 +15,7 @@ import Footer from "./components/Footer";
 
 import "react-toastify/dist/ReactToastify.css";
 import Home from "./components/Home";
-import UserDashboard from "./components/UserDashboard";
+import CustomerDashboard from "./components/CustomerDashboard";
 import UpdateContactInfo from "./components/UpdateContactInfo";
 import BillingHistory from "./components/BillingHistory";
 import AdminDashboard from "./components/AdminDashboard";
@@ -28,8 +28,6 @@ export default function App() {
     <Router>
       {/* <div className="min-h-screen bg-lime-400 font-poppins"> */}
       <div className="min-h-screen  bg-gradient-to-b from-blue-500 via-purple-600 to-red-500 font-poppins">
-     
-
         <Navbar />
         <Routes>
           {/* HomePage route */}
@@ -39,7 +37,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/customer/login" element={<CustomerLogin />} />
           <Route path="/customer/signup" element={<CustomerSignUp />} />
-          <Route path="/customer" element={<UserDashboard />} />
+          <Route path="/customer/dashboard" element={<CustomerDashboard />} />
           <Route
             path="/customer/update-contact"
             element={<UpdateContactInfo />}
@@ -49,13 +47,11 @@ export default function App() {
             element={<BillingHistory />}
           />
 
-
           {/* User Forget-Password Route */}
           <Route
             path="/customer/forgot_password"
             element={<ForgotPassword type={"Customer"} />}
           />
-
 
           {/* User Reset-Password Route */}
           <Route

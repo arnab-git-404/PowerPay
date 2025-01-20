@@ -1,6 +1,12 @@
 import json
 import random
 from typing import List, Dict, Any, Union
+import jwt
+from datetime import datetime, timedelta
+
+SECRET_KEY = "HelloFromSayan"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 class CustomerHandler:
@@ -37,11 +43,12 @@ class CustomerHandler:
 
         customer.append(data)
         self.dump_customer(customer)
-        return acc, "User created successfully"
+        access_token = self.create_access_token(data={"sub": data["email"]})
+        data["token"] = access_token
+        return data, "User created successfully"
 
     def customer_login(self, data: dict) -> bool:
         customer = self.load_customer()
-        print(data["email"], data["account_number"])
         if data["email"]:
             key = "email"
             value = data["email"]
@@ -50,8 +57,12 @@ class CustomerHandler:
             value = data["account_number"]
         user = self.find_user(customer, value, key)
         if user and user[0]["password"] == data["password"]:
-            return True
-        return False
+            access_token = self.create_access_token(
+                data={"sub": user[0]["email"]}
+            )
+            user[0]["token"] = access_token
+            return user[0]
+        return None
 
     def set_address(self, data: dict) -> bool:
         customer = self.load_customer()
@@ -100,7 +111,7 @@ class CustomerHandler:
             return True
         return False
 
-    # Utility Methods
+    # Utility functions
     def load_customer(self) -> List[Dict[str, Any]]:
         try:
             with open(self.customer_file, "r") as file:
@@ -144,3 +155,12 @@ class CustomerHandler:
         ):
             acc = random.randint(111111111, 999999999)
         return acc
+
+    def create_access_token(self, data: dict):
+        to_encode = data.copy()
+        expire = datetime.utcnow() + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return encoded_jwt

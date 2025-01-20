@@ -1,24 +1,27 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import globalContext from '../context/global/globalContext';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import globalContext from "../context/global/globalContext";
+import { Eye, EyeOff } from "lucide-react";
 
 function CustomerSignUp() {
-  document.title = 'PowerPay | Customer Sign Up';
+  document.title = "PowerPay | Customer Sign Up";
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isCustomerLoggedIn, customerLogin, host } =
-    gcontext;
+  const { notify, setSpinner, isCustomerLoggedIn, customerLogin } = gcontext;
+
+  const host = process.env.REACT_APP_HOST;
 
   const [credentials, setCredentials] = useState({
-    name: '',
-    email: '',
-    password: '',
-    cpassword: '',
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    cpassword: "",
   });
 
   const [check, setCheck] = useState({
     name: false,
     email: false,
+    phone: false,
     password: false,
     cpassword: false,
   });
@@ -28,7 +31,7 @@ function CustomerSignUp() {
 
   useEffect(() => {
     if (credentials.password !== credentials.cpassword) {
-      setCheck(prevCheck => ({ ...prevCheck, cpassword: false }));
+      setCheck((prevCheck) => ({ ...prevCheck, cpassword: false }));
     }
   }, [credentials.password, credentials.cpassword]);
 
@@ -40,48 +43,58 @@ function CustomerSignUp() {
 
   let navigate = useNavigate();
   if (isCustomerLoggedIn) {
-    navigate('/customer');
+    navigate("/customer/dashboard");
   }
 
-  const handleSubmit = async e => {
-    const { name, email, password } = credentials;
+  const handleSubmit = async (e) => {
+    const { name, email, phone, password, cpassword } = credentials;
     e.preventDefault();
     setSpinner(true);
-    console.log(name, email, password);
 
-    // const response = await fetch(`${host}/api/auth/createcustomer`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     name,
-    //     email,
-    //     password,
-    //   }),
-    // });
-    // setSpinner(false);
+    try {
+      const response = await fetch(`${host}/customer/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          password,
+          cpassword,
+        }),
+      });
 
-    // const json = await response.json();
-    // if (json.success) {
-    //   // console.log(json);
-    //   const data = {
-    //     name: json.name,
-    //     email: json.email,
-    //     token: json.authToken,
-    //   };
-    //   customerLogin(data);
-    //   navigate('/customer');
-    // } else {
-    //   if (json.error) {
-    //     notify(json.error, 'error');
-    //   } else {
-    //     notify('Invalid credentials', 'error');
-    //   }
-    // }
+      setSpinner(false);
+
+      const json = await response.json();
+      console.log(json);
+      if (response.ok) {
+        const data = {
+          name: json.data.name,
+          email: json.data.email,
+          account_number: json.data.account_number,
+          token: json.data.token, // Assuming the backend returns a token
+        };
+        customerLogin(data);
+        localStorage.setItem("customerData", JSON.stringify(data)); // Save data to local storage
+        localStorage.setItem("token", data.token); // Save token to local storage
+        notify("Signed Up Successfully", "success");
+        navigate("/customer/update-contact");
+        console.log(json);
+      } else {
+        notify(json.detail, "error");
+        console.log(json);
+      }
+    } catch (err) {
+      setSpinner(false);
+      notify("An error occurred. Please try again.", "error");
+      console.log(err);
+    }
   };
 
-  const onChange = e => {
+  const onChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
@@ -112,11 +125,11 @@ function CustomerSignUp() {
                 <input
                   type="text"
                   className={`mt-1 block w-full px-3 py-2 border ${
-                    check.name ? 'border-green-500' : 'border-gray-300'
+                    check.name ? "border-green-500" : "border-gray-300"
                   } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                   name="name"
                   id="name"
-                  onChange={e => {
+                  onChange={(e) => {
                     onChange(e);
                     if (e.target.value.length >= 3) {
                       setCheck({ ...check, name: true });
@@ -137,11 +150,11 @@ function CustomerSignUp() {
                 <input
                   type="email"
                   className={`mt-1 block w-full px-3 py-2 border ${
-                    check.email ? 'border-green-500' : 'border-gray-300'
+                    check.email ? "border-green-500" : "border-gray-300"
                   } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                   name="email"
                   id="email"
-                  onChange={e => {
+                  onChange={(e) => {
                     onChange(e);
                     if (emailRegex.test(e.target.value)) {
                       setCheck({ ...check, email: true });
@@ -154,6 +167,31 @@ function CustomerSignUp() {
               </div>
               <div className="mb-3">
                 <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  className={`mt-1 block w-full px-3 py-2 border ${
+                    check.phone ? "border-green-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  name="phone"
+                  id="phone"
+                  onChange={(e) => {
+                    onChange(e);
+                    if (e.target.value.length >= 10) {
+                      setCheck({ ...check, phone: true });
+                    } else {
+                      setCheck({ ...check, phone: false });
+                    }
+                  }}
+                  placeholder="Enter your phone number"
+                />
+              </div>
+              <div className="mb-3">
+                <label
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700"
                 >
@@ -161,16 +199,16 @@ function CustomerSignUp() {
                 </label>
                 <div className="relative mb-3">
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     className={`mt-1 block w-full px-3 py-2 border ${
-                      check.password ? 'border-green-500' : 'border-gray-300'
+                      check.password ? "border-green-500" : "border-gray-300"
                     } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     name="password"
                     id="password"
                     onFocus={() => {
                       setPassInfo(true);
                     }}
-                    onChange={e => {
+                    onChange={(e) => {
                       onChange(e);
                       if (passRegex.test(e.target.value)) {
                         setCheck({ ...check, password: true });
@@ -197,8 +235,8 @@ function CustomerSignUp() {
                 className="text-sm"
                 style={
                   check.password
-                    ? { display: 'none' }
-                    : { display: 'block', color: 'red' }
+                    ? { display: "none" }
+                    : { display: "block", color: "red" }
                 }
               >
                 <ul>
@@ -219,14 +257,14 @@ function CustomerSignUp() {
                 </label>
                 <div className="relative mb-3">
                   <input
-                    type={showCPassword ? 'text' : 'password'}
+                    type={showCPassword ? "text" : "password"}
                     className={`mt-1 block w-full px-3 py-2 border ${
-                      check.cpassword ? 'border-green-500' : 'border-gray-300'
+                      check.cpassword ? "border-green-500" : "border-gray-300"
                     } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     name="cpassword"
                     id="cpassword"
                     readOnly={check.password ? false : true}
-                    onChange={e => {
+                    onChange={(e) => {
                       onChange(e);
                       if (e.target.value === credentials.password) {
                         setCheck({ ...check, cpassword: true });
@@ -256,6 +294,7 @@ function CustomerSignUp() {
                   disabled={
                     check.name &&
                     check.email &&
+                    check.phone &&
                     check.password &&
                     check.cpassword
                       ? false

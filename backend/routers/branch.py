@@ -20,6 +20,15 @@ async def branch_dashboard(dashboard: BranchDashboard):
     raise HTTPException(status_code=404, detail="Branch not found")
 
 
+@router.get("/branch_codes")
+async def branch_codes():
+    branch_codes = branch_handler.get_branche_codes()
+    return JSONResponse(
+        status_code=200,
+        content={"message": "Branch codes", "data": branch_codes}
+    )
+
+
 @router.post("/delete_account")
 async def delete_account(account: DeleteAccount):
     result = customer_handler.delete_account(account.account_number)
