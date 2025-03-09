@@ -3,7 +3,7 @@ from typing import Dict, Union, Any
 import jwt
 from datetime import datetime, timedelta
 
-SECRET_KEY = "HelloFromSayan"
+SECRET_KEY = "b4e7b1"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
